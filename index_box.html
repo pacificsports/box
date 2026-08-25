@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Box Info — Pacific Sports</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=Barlow:wght@500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#141d2b; --ink2:#3a4657; --muted:#6b7688;
+    --line:#e6eaf1; --bg:#eef1f5; --card:#ffffff;
+    --band:#141d2b; --bandink:#ffffff; --bandmut:#9aa6ba;
+    --chip:#f2f4f8; --chipink:#1c2431;
+    --haiti-bg:#ECE3CE; --haiti-fg:#141d2b;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --ink:#f2f5fa; --ink2:#c3ccda; --muted:#8994a6;
+      --line:#28303d; --bg:#0b0e13; --card:#161c26;
+      --band:#0a0e15; --bandink:#ffffff; --bandmut:#8b97ab;
+      --chip:#1f2733; --chipink:#eef2f8;
+      --haiti-bg:#ECE3CE; --haiti-fg:#141d2b;
+    }
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;padding:0;}
+  body{background:var(--bg);color:var(--ink);font-family:'Barlow','Helvetica Neue',Arial,sans-serif;
+    min-height:100dvh;display:flex;justify-content:center;padding:16px;padding:max(16px,env(safe-area-inset-top)) 16px max(16px,env(safe-area-inset-bottom));}
+  .wrap{width:100%;max-width:440px;align-self:center;}
+  .card{background:var(--card);border-radius:22px;overflow:hidden;box-shadow:0 12px 44px rgba(20,29,43,.14);}
+  .band{background:var(--band);color:var(--bandink);padding:20px 22px 22px;}
+  .band .top{display:flex;align-items:center;justify-content:space-between;gap:10px;}
+  .band .co{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:18px;letter-spacing:.02em;}
+  .band .co small{display:block;font-size:10px;font-weight:600;color:var(--bandmut);letter-spacing:.08em;margin-top:3px;text-transform:uppercase;}
+  .band .haiti{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:11.5px;letter-spacing:.09em;background:var(--haiti-bg);color:var(--haiti-fg);padding:7px 12px;border-radius:999px;white-space:nowrap;}
+  .band .stylewrap{margin-top:16px;}
+  .band .lab{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;letter-spacing:.3em;color:var(--bandmut);text-transform:uppercase;}
+  .band .style{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:72px;line-height:.88;letter-spacing:.01em;margin-top:2px;}
+  .band .item{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:19px;letter-spacing:.02em;color:var(--bandmut);margin-top:6px;text-transform:uppercase;}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;padding:16px 22px 2px;}
+  .chip{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:.04em;background:var(--chip);color:var(--chipink);padding:6px 12px;border-radius:8px;text-transform:uppercase;}
+  .grid{padding:8px 22px 4px;}
+  .row{display:flex;align-items:baseline;justify-content:space-between;gap:14px;padding:13px 0;border-bottom:1px solid var(--line);}
+  .row:last-child{border-bottom:none;}
+  .row .k{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:13px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase;flex:none;}
+  .row .v{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:25px;line-height:1;text-align:right;word-break:break-word;}
+  .codes{padding:4px 22px 18px;display:grid;gap:10px;}
+  .codebox{background:var(--chip);border-radius:14px;padding:12px 14px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+  .codebox .k{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:12px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase;}
+  .codebox .v{font-family:'SF Mono','Roboto Mono',Consolas,monospace;font-weight:700;font-size:15px;text-align:right;word-break:break-all;}
+  .foot{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 22px;border-top:1px solid var(--line);}
+  .foot .made{font-family:'Barlow Condensed',sans-serif;font-weight:900;font-size:16px;letter-spacing:.05em;}
+  .foot .date{font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:14px;color:var(--muted);}
+  .tiny{margin:14px 4px 0;text-align:center;font-size:11px;color:var(--muted);}
+  .hide{display:none !important;}
+</style>
+</head>
+<body>
+  <div class="wrap"><div class="card">
+    <div class="band">
+      <div class="top">
+        <div class="co">PACIFIC SPORTS<small>Peace Textile America, Inc</small></div>
+        <div class="haiti">MADE IN HAITI</div>
+      </div>
+      <div class="stylewrap">
+        <div class="lab">Style</div>
+        <div class="style" id="v-style">—</div>
+        <div class="item" id="v-item"></div>
+      </div>
+    </div>
+    <div class="chips" id="chips"></div>
+    <div class="grid">
+      <div class="row"><span class="k">Color</span><span class="v" id="v-color">—</span></div>
+      <div class="row"><span class="k">Size</span><span class="v" id="v-size">—</span></div>
+      <div class="row"><span class="k">Quantity</span><span class="v" id="v-qty">—</span></div>
+      <div class="row" id="r-lot"><span class="k">Lot</span><span class="v" id="v-lot">—</span></div>
+    </div>
+    <div class="codes">
+      <div class="codebox"><span class="k">Carton #</span><span class="v" id="v-ctn">—</span></div>
+      <div class="codebox"><span class="k">SSCC</span><span class="v" id="v-sscc">—</span></div>
+    </div>
+    <div class="foot"><div class="made">MADE IN HAITI</div><div class="date" id="v-date"></div></div>
+  </div><div class="tiny">Peace Textile America, Inc &nbsp;·&nbsp; dba Pacific Sports</div></div>
+<script>
+(function(){
+  function P(n){try{var u=new URL(location.href);var v=u.searchParams.get(n);if(v!=null)return v;}catch(e){}try{var q=new URLSearchParams((location.hash||'').replace(/^#/,''));var v2=q.get(n);if(v2!=null)return v2;}catch(e){}return null;}
+  function up(s){return (s==null?'':String(s)).toUpperCase();}
+  function T(id,v){var e=document.getElementById(id);if(e)e.textContent=(v==null||v==='')?'':v;}
+  var demo=!location.search&&!location.hash; function g(n,d){var v=P(n);return (v==null||v==='')?(demo?d:''):v;}
+  var style=g('s','8368'),item=g('i','ADULT CVC S/S'),color=g('c','CINNAMON'),size=g('z','M'),qty=g('q','72 PCS'),con=g('con','SIDE SEAM'),lot=g('lot','C86513213'),us=g('us',demo?'1':''),bldg=g('b','27'),ctn=g('ctn','0-00011'),sscc=g('sscc','008600163991000111'),date=g('d','25 AUG 2026');
+  T('v-style',up(style)||'—'); var it=document.getElementById('v-item'); it.textContent=up(item); it.classList.toggle('hide',!item);
+  T('v-color',up(color)||'—');T('v-size',up(size)||'—');T('v-qty',up(qty)||'—');
+  var lr=document.getElementById('r-lot'); T('v-lot',up(lot)||'—'); lr.classList.toggle('hide',!lot);
+  T('v-ctn',up(ctn)||'—');T('v-sscc',up(sscc)||'—');T('v-date',up(date));
+  var chips=[]; if(con)chips.push(up(con)); if(String(us)==='1'||up(us)==='US')chips.push('US'); if(bldg)chips.push('BLDG '+up(bldg));
+  var cw=document.getElementById('chips'); cw.innerHTML=''; chips.forEach(function(c){var d=document.createElement('div');d.className='chip';d.textContent=c;cw.appendChild(d);}); cw.classList.toggle('hide',!chips.length);
+  document.title=(up(style)||'Box')+' · '+up(color)+' '+up(size)+' — Pacific Sports';
+})();
+</script>
+</body>
+</html>
