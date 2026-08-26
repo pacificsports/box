@@ -7,79 +7,121 @@
 <title>Box Info &mdash; Pacific Sports</title>
 <style>
   :root{
-    --ink:#0f1720; --muted:#64748b; --line:#e2e8f0; --bg:#f1f5f9; --card:#fff; --accent:#0f1720;
+    --navy:#101a2c; --navy2:#16233a; --onNavy:#ffffff; --navySub:#8b9cb5;
+    --cream:#e9e0c6; --creamInk:#3a3222;
+    --ink:#0f1720; --muted:#6b7a90; --line:#e6eaf0; --fill:#f1f4f8;
+    --bg:#eef1f6; --card:#ffffff;
   }
   @media (prefers-color-scheme: dark){
-    :root{ --ink:#e8eef5; --muted:#94a3b8; --line:#1e293b; --bg:#0b1220; --card:#111a29; --accent:#e8eef5; }
+    :root{ --ink:#e8eef5; --muted:#95a4b8; --line:#1e2a3d; --fill:#16202f;
+           --bg:#080d16; --card:#0e1622; }
   }
   *{ box-sizing:border-box; -webkit-text-size-adjust:100%; }
   body{ margin:0; background:var(--bg); color:var(--ink);
         font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,'Helvetica Neue',Arial,sans-serif; }
-  .wrap{ max-width:520px; margin:0 auto; padding:18px 14px 40px; }
+  .wrap{ max-width:400px; margin:0 auto; padding:16px 14px 34px; }
 
-  .brand{ display:flex; align-items:baseline; gap:8px; padding:6px 2px 14px; }
-  .brand b{ font-size:17px; font-weight:800; letter-spacing:.2px; }
-  .brand span{ font-size:12px; color:var(--muted); }
+  .card{ background:var(--card); border-radius:20px; overflow:hidden;
+         box-shadow:0 10px 30px rgba(15,23,32,.13), 0 1px 2px rgba(15,23,32,.06); }
 
-  .card{ background:var(--card); border:1px solid var(--line); border-radius:16px;
-         box-shadow:0 1px 2px rgba(15,23,32,.05); overflow:hidden; }
+  /* ── 짙은 머리 ── */
+  .hero{ background:var(--navy); color:var(--onNavy); padding:16px 18px 20px; }
+  .hrow{ display:flex; align-items:flex-start; gap:10px; }
+  .hbrand{ flex:1; min-width:0; }
+  .hbrand b{ display:block; font-size:16.5px; font-weight:900; letter-spacing:.06em; }
+  .hbrand span{ display:block; font-size:10px; font-weight:700; letter-spacing:.14em;
+                color:var(--navySub); margin-top:3px; }
+  .pill{ flex:none; background:var(--cream); color:var(--creamInk); border-radius:999px;
+         padding:7px 13px; font-size:11px; font-weight:900; letter-spacing:.08em; white-space:nowrap; }
+  .hlab{ font-size:11px; font-weight:800; letter-spacing:.18em; color:var(--navySub); margin-top:16px; }
+  .hbig{ font-size:54px; font-weight:900; line-height:1; letter-spacing:-1.5px; margin-top:2px;
+         word-break:break-word; }
+  .hbig.sm{ font-size:38px; letter-spacing:-.8px; }
+  .hsub{ font-size:18px; font-weight:800; color:var(--navySub); margin-top:8px; line-height:1.25; }
 
-  .hero{ padding:20px 18px 16px; border-bottom:1px solid var(--line); }
-  .hero .lab{ font-size:11px; font-weight:800; letter-spacing:.12em; color:var(--muted); }
-  .hero .style{ font-size:44px; font-weight:900; line-height:1; letter-spacing:-.5px; margin-top:4px; }
-  .hero .item{ font-size:14px; font-weight:600; color:var(--muted); margin-top:7px; }
+  /* ── 흰 몸통 ── */
+  .tags{ display:flex; flex-wrap:wrap; gap:7px; padding:16px 18px 4px; }
+  .tags:empty{ display:none; }
+  .tag{ background:var(--fill); color:var(--muted); border-radius:999px;
+        padding:6px 12px; font-size:11px; font-weight:900; letter-spacing:.07em; }
+  .tag.on{ color:var(--ink); }
 
-  .rows{ padding:4px 18px 8px; }
-  .r{ display:flex; align-items:baseline; gap:12px; padding:13px 0; border-bottom:1px solid var(--line); }
+  .rows{ padding:6px 18px 4px; }
+  .r{ display:flex; align-items:center; gap:12px; padding:14px 0; border-bottom:1px solid var(--line); }
   .r:last-child{ border-bottom:none; }
-  .r .k{ flex:none; width:96px; font-size:11px; font-weight:800; letter-spacing:.11em; color:var(--muted); }
-  .r .v{ flex:1; font-size:19px; font-weight:800; word-break:break-word; }
-  .r.big .v{ font-size:24px; }
-  .r .v.mono{ font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:15px; font-weight:700; letter-spacing:.02em; }
+  .r .k{ flex:none; font-size:11px; font-weight:800; letter-spacing:.14em; color:var(--muted); }
+  .r .v{ flex:1; text-align:right; font-size:23px; font-weight:900; word-break:break-word; }
+  .r .v em{ font-style:normal; font-size:13px; font-weight:800; color:var(--muted); margin-left:6px; }
+  .r.box{ background:var(--fill); border-bottom:none; border-radius:12px;
+          padding:12px 14px; margin:8px 0; }
+  .r.box .v{ font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+             font-size:15px; font-weight:800; letter-spacing:.02em; }
 
-  .tags{ display:flex; flex-wrap:wrap; gap:7px; padding:0 18px 18px; }
-  .tag{ font-size:11.5px; font-weight:800; letter-spacing:.06em; padding:5px 10px; border-radius:999px;
-        border:1px solid var(--line); color:var(--muted); }
-  .tag.on{ border-color:var(--accent); color:var(--accent); }
+  /* ── 여러 품목이 든 박스 ── */
+  .lines{ padding:4px 18px 2px; }
+  .ln{ display:flex; align-items:baseline; gap:9px; padding:12px 0; border-bottom:1px solid var(--line); }
+  .ln:last-child{ border-bottom:none; }
+  .ln .st{ flex:none; width:52px; font-size:15px; font-weight:900;
+           font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; }
+  .ln .co{ flex:1; min-width:0; font-size:15px; font-weight:700; color:var(--ink); }
+  .ln .sz{ flex:none; min-width:34px; text-align:right; font-size:16px; font-weight:900; }
+  .ln .qt{ flex:none; width:64px; text-align:right; font-size:15px; font-weight:800; color:var(--muted); }
 
-  .foot{ text-align:center; padding:16px 18px 20px; border-top:1px solid var(--line); }
-  .foot .h{ font-size:15px; font-weight:900; letter-spacing:.06em; }
-  .foot .m{ font-size:11.5px; color:var(--muted); margin-top:3px; }
+  .foot{ text-align:center; padding:15px 18px 18px; border-top:1px solid var(--line); }
+  .foot .m{ font-size:12.5px; font-weight:800; color:var(--muted); letter-spacing:.03em; }
 
-  .note{ font-size:11.5px; color:var(--muted); text-align:center; margin-top:14px; line-height:1.5; }
-  .bad{ padding:28px 18px; text-align:center; }
-  .bad .t{ font-size:17px; font-weight:800; }
+  .note{ font-size:11.5px; color:var(--muted); text-align:center; margin-top:14px; line-height:1.55; }
+  .bad{ padding:30px 20px; text-align:center; }
+  .bad .t{ font-size:17px; font-weight:900; }
   .bad .d{ font-size:13px; color:var(--muted); margin-top:8px; line-height:1.55; }
   .hide{ display:none !important; }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <div class="brand"><b>PACIFIC SPORTS</b></div>
 
+  <!-- 공장에서 온 온전한 카톤 (한 박스 = 한 품목) -->
   <div class="card" id="card">
     <div class="hero">
-      <div class="lab">STYLE</div>
-      <div class="style" id="v-style">&mdash;</div>
-      <div class="item hide" id="v-item"></div>
+      <div class="hrow">
+        <div class="hbrand"><b>PACIFIC SPORTS</b></div>
+        <div class="pill">MADE IN HAITI</div>
+      </div>
+      <div class="hlab">STYLE</div>
+      <div class="hbig" id="v-style">&mdash;</div>
+      <div class="hsub hide" id="v-item"></div>
     </div>
 
     <div class="rows">
-      <div class="r big" id="r-color"><span class="k">COLOR</span><span class="v" id="v-color"></span></div>
-      <div class="r big" id="r-size"><span class="k">SIZE</span><span class="v" id="v-size"></span></div>
-      <div class="r big" id="r-qty"><span class="k">QUANTITY</span><span class="v" id="v-qty"></span></div>
+      <div class="r" id="r-color"><span class="k">COLOR</span><span class="v" id="v-color"></span></div>
+      <div class="r" id="r-size"><span class="k">SIZE</span><span class="v" id="v-size"></span></div>
+      <div class="r" id="r-qty"><span class="k">QUANTITY</span><span class="v" id="v-qty"></span></div>
       <div class="r" id="r-lot"><span class="k">LOT</span><span class="v" id="v-lot"></span></div>
-      <div class="r" id="r-ctn"><span class="k">CARTON #</span><span class="v mono" id="v-ctn"></span></div>
-      <div class="r" id="r-sscc"><span class="k">SSCC</span><span class="v mono" id="v-sscc"></span></div>
-      <div class="r" id="r-date"><span class="k">DATE</span><span class="v" id="v-date"></span></div>
+      <div class="r box" id="r-ctn"><span class="k">CARTON #</span><span class="v" id="v-ctn"></span></div>
+      <div class="r box" id="r-sscc"><span class="k">SSCC</span><span class="v" id="v-sscc"></span></div>
     </div>
 
-    <div class="tags" id="tags"></div>
+    <div class="foot"><div class="m">epacificsports.com</div></div>
+  </div>
 
-    <div class="foot">
-      <div class="h">MADE IN HAITI</div>
-      <div class="m">Peace Textile America, Inc. dba Pacific Sports</div>
+  <!-- PC Room 이 다시 싼 박스 (한 박스 = 여러 품목) -->
+  <div class="card hide" id="pbcard">
+    <div class="hero">
+      <div class="hrow">
+        <div class="hbrand"><b>PACIFIC SPORTS</b></div>
+        <div class="pill" id="p-pill">PACKED</div>
+      </div>
+      <div class="hlab">PO&#35;</div>
+      <div class="hbig" id="p-po">&mdash;</div>
+      <div class="hsub" id="p-cust"></div>
     </div>
+
+    <div class="tags" id="p-tags"></div>
+    <div class="lines" id="p-lines"></div>
+
+    <div class="rows"><div class="r"><span class="k">TOTAL</span><span class="v" id="p-tot"></span></div></div>
+
+    <div class="foot"><div class="m">epacificsports.com</div></div>
   </div>
 
   <div class="card hide" id="empty">
@@ -97,7 +139,10 @@
   var GS1_PREFIX = '08600163991';   // Peace Textile America GS1 company prefix (11-digit form)
 
   function txt(id, v){ var e=document.getElementById(id); if(e) e.textContent = (v==null?'':String(v)); }
+  function html(id, v){ var e=document.getElementById(id); if(e) e.innerHTML = (v==null?'':String(v)); }
   function show(id, on){ var e=document.getElementById(id); if(e) e.classList[on?'remove':'add']('hide'); }
+  function esc(s){ return String(s==null?'':s).replace(/[&<>"]/g, function(c){
+    return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'})[c]; }); }
 
   // '+' means space inside our own path segments, so decode it explicitly
   function dec(s){
@@ -105,6 +150,11 @@
     try{ return decodeURIComponent(String(s).replace(/\+/g,' ')); }
     catch(e){ return String(s).replace(/\+/g,' '); }
   }
+  function chip(host, text, on){
+    var e=document.createElement('span'); e.className='tag'+(on?' on':'');
+    e.textContent=text; host.appendChild(e);
+  }
+  function pcsText(n){ return n + ' PCS'; }
 
   function gs1Check(body){                      // GS1 mod-10, body = 17 digits
     var sum=0, d=String(body);
@@ -118,18 +168,33 @@
     s=String(s||''); if(!/^\d{18}$/.test(s)) return false;
     return gs1Check(s.slice(0,17)) === parseInt(s.charAt(17),10);
   }
-  function ssccGrouped(s){ return s.charAt(0)+' '+s.substr(1,11)+' '+s.substr(12,5)+' '+s.charAt(17); }
   function ctnFromSscc(s){                      // ext digit + 5-digit serial, e.g. 0-00001
     if(!/^\d{18}$/.test(s)) return '';
     if(s.substr(1,11) !== GS1_PREFIX) return '';
     return s.charAt(0) + '-' + s.substr(12,5);
   }
 
-  // ── read the box out of the URL ────────────────────────────────────────────
-  // NEW  (uppercase path form, small QR):
-  //      /box/00/{SSCC}/{STYLE}/{SIZE}/{QTY}/{COLOR}
-  // OLD  (hash form, still on cartons already shipped):
-  //      /box/#s=..&i=..&c=..&z=..&q=..&con=..&lot=..&us=1&b=..&ctn=..&sscc=..&d=..
+  /* ── PC Room 박스 ──────────────────────────────────────────────────────────
+     /box/pb/{CUSTOMER}/{PO}/{WH}/{BOX}/{STYLE*COLOR*SIZE*QTY}/...
+     공장 카톤은 한 박스에 한 품목이지만 PC Room 이 낱장을 다시 싼 박스는 여러 품목이
+     섞여 있다. 그래서 같은 디자인 위에 품목 목록을 그리는 카드를 따로 쓴다. */
+  function readPb(){
+    var p = decodeURI(location.pathname || '');
+    var m = p.match(/\/pb\/([^\/]*)\/([^\/]*)\/([^\/]*)\/([^\/]*)\/(.*)$/i);
+    if(!m) return null;
+    var items = String(m[5]||'').split('/').map(function(seg){
+      var a = seg.split('*');
+      if(!a[0]) return null;
+      return { st:dec(a[0]), co:dec(a[1]||''), sz:dec(a[2]||''), qt:parseInt(a[3],10)||0 };
+    }).filter(function(x){ return x; });
+    if(!items.length) return null;
+    return { cust:dec(m[1]), po:dec(m[2]), wh:dec(m[3]), box:dec(m[4]), items:items };
+  }
+
+  /* ── 공장 카톤 ──
+     NEW (uppercase path form, small QR):  /box/00/{SSCC}/{STYLE}/{SIZE}/{QTY}/{COLOR}
+     OLD (hash form, still on cartons already shipped):
+          /box/#s=..&i=..&c=..&z=..&q=..&con=..&lot=..&us=1&b=..&ctn=..&sscc=..&d=.. */
   function readPath(){
     var p = decodeURI(location.pathname || '');
     var m = p.match(/\/00\/(\d{18})((?:\/[^\/]*)*)\/?$/i);
@@ -149,6 +214,33 @@
     return Object.keys(o).length ? o : null;
   }
 
+  // ── PC Room 박스 먼저 ──
+  var pb = readPb();
+  if(pb){
+    show('card', false); show('pbcard', true);
+    txt('p-pill', pb.wh ? ('PACKED · ' + pb.wh.toUpperCase()) : 'PACKED');
+    var po = pb.po || '—';
+    var el = document.getElementById('p-po');
+    el.textContent = po;
+    if(po.length > 10) el.className = 'hbig sm';
+    txt('p-cust', pb.cust || '');
+    var tw = document.getElementById('p-tags');
+    if(pb.box) chip(tw, 'BOX ' + pb.box.toUpperCase(), true);
+    chip(tw, pb.items.length + ' ITEM' + (pb.items.length>1?'S':''), false);
+
+    var host = document.getElementById('p-lines'), tot = 0;
+    pb.items.forEach(function(it){
+      tot += it.qt;
+      var row = document.createElement('div'); row.className = 'ln';
+      function cell(cls, v){ var e=document.createElement('span'); e.className=cls; e.textContent=v; row.appendChild(e); }
+      cell('st', it.st); cell('co', it.co); cell('sz', it.sz); cell('qt', it.qt + ' pcs');
+      host.appendChild(row);
+    });
+    html('p-tot', pcsText(tot));
+    txt('note', 'Repacked box — the pieces listed above are what is inside this carton.');
+    return;
+  }
+
   var d = readPath() || readHash();
   if(!d){ show('card',false); show('empty',true); return; }
 
@@ -159,40 +251,23 @@
   var lot   = d.lot || '';
   var sscc  = (d.sscc || '').replace(/\D/g,'');
   var ctn   = d.ctn || ctnFromSscc(sscc);
-  var date  = d.d || '';
   var item  = d.i || '';
-  var con   = d.con || '';
-  var us    = (d.us === '1' || d.us === 'US');
-  var bldg  = d.b || '';
-
-  if(qty && /^\d+$/.test(qty)){
-    var n = parseInt(qty,10), dz = n/12;
-    qty = n + ' PCS' + (dz === Math.floor(dz) ? '  [' + dz + ' DZ]' : '');
-  }
 
   txt('v-style', style || '—');
   txt('v-item', item); show('v-item', !!item);
   txt('v-color', color); show('r-color', !!color);
   txt('v-size',  size);  show('r-size',  !!size);
-  txt('v-qty',   qty);   show('r-qty',   !!qty);
+  if(qty && /^\d+$/.test(qty)) html('v-qty', pcsText(parseInt(qty,10)));
+  else txt('v-qty', qty);
+  show('r-qty', !!qty);
   txt('v-lot',   lot);   show('r-lot',   !!lot);
   txt('v-ctn',   ctn);   show('r-ctn',   !!ctn);
-  txt('v-sscc',  sscc ? '(00) ' + ssccGrouped(sscc) : ''); show('r-sscc', !!sscc);
-  txt('v-date',  date);  show('r-date',  !!date);
-
-  var tags = [];
-  if(con)  tags.push(['ON', con.toUpperCase()]);
-  if(us)   tags.push(['ON', 'US COTTON']);
-  if(bldg) tags.push(['', 'BLDG ' + bldg]);
-  var tw = document.getElementById('tags');
-  tags.forEach(function(t){
-    var e=document.createElement('span'); e.className='tag'+(t[0]==='ON'?' on':''); e.textContent=t[1]; tw.appendChild(e);
-  });
+  txt('v-sscc',  sscc);  show('r-sscc',  !!sscc);
 
   var note = [];
   if(sscc && !ssccValid(sscc)) note.push('⚠ SSCC check digit does not match — re-scan or check the label.');
   note.push('Carton identified by SSCC (GS1 Application Identifier 00).');
-  document.getElementById('note').innerHTML = note.join('<br>');
+  html('note', note.join('<br>'));
 })();
 </script>
 </body>
