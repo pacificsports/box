@@ -5,6 +5,9 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
 <title>Box Info &mdash; Pacific Sports</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --navy:#101a2c; --navy2:#16233a; --onNavy:#ffffff; --navySub:#8b9cb5;
@@ -67,8 +70,10 @@
   .ln .sz{ flex:none; min-width:34px; text-align:right; font-size:16px; font-weight:900; }
   .ln .qt{ flex:none; width:64px; text-align:right; font-size:15px; font-weight:800; color:var(--muted); }
 
-  .foot{ text-align:center; padding:15px 18px 18px; border-top:1px solid var(--line); }
-  .foot .m{ font-size:12.5px; font-weight:800; color:var(--muted); letter-spacing:.03em; }
+  .foot{ text-align:center; padding:0; border-top:1px solid var(--line); }
+  .foot .m{ display:block; background:var(--navy); color:#fff; padding:15px 18px;
+            font-family:'Space Grotesk',ui-rounded,'Segoe UI',system-ui,sans-serif;
+            font-size:16px; font-weight:700; letter-spacing:.11em; }
 
   .note{ font-size:11.5px; color:var(--muted); text-align:center; margin-top:14px; line-height:1.55; }
   .bad{ padding:30px 20px; text-align:center; }
@@ -138,6 +143,10 @@
 (function(){
   var GS1_PREFIX = '08600163991';   // Peace Textile America GS1 company prefix (11-digit form)
 
+  /* 스타일 번호 → 품명. 새 QR(경로형)에는 품명이 안 들어간다 — 코드를 작게 유지하려고 뺐다.
+     어차피 스타일 번호만 알면 품명은 정해져 있으므로 여기서 붙인다. */
+  var ITEM = {"1180":"ADULT 18/1 CPRS S/S","1210":"ADULT 22/1 100% S/S","1212":"ADULT 22/1 100% L/S","1214":"ADULT 22/1 100% TANK","1230":"ADULT TRI S/S","1232":"ADULT TRI L/S","1234":"ADULT TRI TANK","1240":"ADULT 24/1 SLUB S/S","1248":"ADULT 24/1 SLUB HOODIE L/S","1260":"ADULT 22/1 COLOR HTR S/S","1262":"ADULT 22/1 COLOR HTR L/S","1264":"ADULT 22/1 COLOR HTR TANK","1280":"ADULT 22/1 CPRS S/S","1290":"ADULT 20/1 PFD S/S","1292":"ADULT 20/1 PFD L/S","1311":"ADULT 30/1 100% V-NECK S/S","1314":"ADULT 30/1 100% TANK","1315":"ADULT 30/1 100% S/S","1322":"ADULT 30/1 100% L/S","1330":"ADULT OMNI S/S","1332":"ADULT OMNI L/S","1348":"ADULT 30/1 CVC HOODIE L/S","1350":"ADULT SNOW HTR S/S","1351":"ADULT SNOW HTR V-NECK S/S","1352":"ADULT SNOW HTR L/S","1354":"ADULT SNOW HTR TANK","1360":"ADULT 30/1 COLOR HTR S/S","1362":"ADULT 30/1 CVC L/S","1364":"ADULT 30/1 CVC TANK","1368":"ADULT 30/1 CVC S/S","1388":"ADULT 30/1 CVC S/S","1390":"ADULT 30/1 PFD S/S","1392":"ADULT 30/1 PFD L/S","1394":"ADULT 30/1 PFD TANK","1530":"ADULT TRIBLEND S/S","1532":"ADULT TRIBLEND L/S","1534":"ADULT TRIBLEND TANK","1543":"ADULT RAGLAN","1580":"ADULT POLY LINEN S/S","1595":"ADULT POLY RAYON S/S","1600":"ADULT 16/1 100% S/S","1615":"ADULT 16/1 100% S/S","1650":"ADULT SIRO S/S","1652":"ADULT SIRO L/S","1690":"ADULT 16/1 100% S/S","2210":"YOUTH 22/1 100% S/S","2212":"YOUTH 22/1 100% L/S","2310":"YOUTH 30/1 100% S/S","2316":"KIDS 30/1 100% S/S","2350":"YOUTH SNOW HTR S/S","2382":"KIDS 30/1 CVC L/S","2388":"KIDS 30/1 CVC S/S","3210":"JUVY 22/1 100% S/S","3212":"JUVY 22/1 100% L/S","3310":"JUVY 30/1 100% S/S","3350":"JUVY SNOW HTR S/S","5210":"TODDLER 22/1 100% S/S","5212":"TODDLER 22/1 100% L/S","5310":"TODDLER 30/1 100% S/S","5350":"TODDLER SNOW HTR S/S","6535":"ADULT GALAXY S/S","8110":"ADULT POLY S/S","8150":"ADULT CATIONIC S/S","8155":"ADULT SPACEDYE S/S","8180":"ADULT MESH S/S","8368":"ADULT 30/1 CVC S/S","9307":"ADULT INFINITE S/S","1315R":"ADULT 30/1 100% RINGER S/S"};
+
   function txt(id, v){ var e=document.getElementById(id); if(e) e.textContent = (v==null?'':String(v)); }
   function html(id, v){ var e=document.getElementById(id); if(e) e.innerHTML = (v==null?'':String(v)); }
   function show(id, on){ var e=document.getElementById(id); if(e) e.classList[on?'remove':'add']('hide'); }
@@ -180,7 +189,7 @@
      섞여 있다. 그래서 같은 디자인 위에 품목 목록을 그리는 카드를 따로 쓴다. */
   function readPb(){
     var p = decodeURI(location.pathname || '');
-    var m = p.match(/\/pb\/([^\/]*)\/([^\/]*)\/([^\/]*)\/([^\/]*)\/(.*)$/i);
+    var m = p.match(/\/(?:pb|fb)\/([^\/]*)\/([^\/]*)\/([^\/]*)\/([^\/]*)\/(.*)$/i);
     if(!m) return null;
     var items = String(m[5]||'').split('/').map(function(seg){
       var a = seg.split('*');
@@ -188,7 +197,7 @@
       return { st:dec(a[0]), co:dec(a[1]||''), sz:dec(a[2]||''), qt:parseInt(a[3],10)||0 };
     }).filter(function(x){ return x; });
     if(!items.length) return null;
-    return { cust:dec(m[1]), po:dec(m[2]), wh:dec(m[3]), box:dec(m[4]), items:items };
+    return { full:/\/fb\//i.test(p), cust:dec(m[1]), po:dec(m[2]), wh:dec(m[3]), box:dec(m[4]), items:items };
   }
 
   /* ── 공장 카톤 ──
@@ -237,7 +246,9 @@
       host.appendChild(row);
     });
     html('p-tot', pcsText(tot));
-    txt('note', 'Repacked box — the pieces listed above are what is inside this carton.');
+    txt('note', pb.full
+      ? 'Full carton — the piece count above is the whole box.'
+      : 'Repacked box — the pieces listed above are what is inside this carton.');
     return;
   }
 
@@ -251,7 +262,7 @@
   var lot   = d.lot || '';
   var sscc  = (d.sscc || '').replace(/\D/g,'');
   var ctn   = d.ctn || ctnFromSscc(sscc);
-  var item  = d.i || '';
+  var item  = d.i || ITEM[String(style).trim()] || '';
 
   txt('v-style', style || '—');
   txt('v-item', item); show('v-item', !!item);
