@@ -103,7 +103,6 @@
       <div class="r" id="r-qty"><span class="k">QUANTITY</span><span class="v" id="v-qty"></span></div>
       <div class="r" id="r-lot"><span class="k">LOT</span><span class="v" id="v-lot"></span></div>
       <div class="r box" id="r-ctn"><span class="k">CARTON #</span><span class="v" id="v-ctn"></span></div>
-      <div class="r" id="r-made"><span class="k">MADE</span><span class="v" id="v-made"></span></div>
       <div class="r box" id="r-sscc"><span class="k">SSCC</span><span class="v" id="v-sscc"></span></div>
     </div>
 
@@ -223,8 +222,10 @@
     if(!m) return null;
     var seg = m[2] ? m[2].replace(/^\//,'').split('/') : [];
     var ctn = m[1].toUpperCase();
-    var dm  = ctn.match(/^(\d{2})(\d{2})(\d{2})-/);
-    return { ctn:ctn, made: dm ? ('20'+dm[1]+'-'+dm[2]+'-'+dm[3]) : '',
+    /* 카톤번호 앞 6자리는 생산일이지만 여기서는 절대 풀어서 보여주지 않는다.
+       스캔하는 사람은 거래처·창고·3rd party 이고, 오래 보관된 재고의 생산일이
+       그대로 노출되면 우리에게 불리하다. 번호는 그대로 두되 뜻은 우리만 안다. */
+    return { ctn:ctn, isC:true,
              s:dec(seg[0]), z:dec(seg[1]), q:dec(seg[2]), c:dec(seg[3]) };
   }
   function readHash(){
@@ -289,12 +290,11 @@
   show('r-qty', !!qty);
   txt('v-lot',   lot);   show('r-lot',   !!lot);
   txt('v-ctn',   ctn);   show('r-ctn',   !!ctn);
-  txt('v-made',  d.made||''); show('r-made', !!d.made);
   txt('v-sscc',  sscc);  show('r-sscc',  !!sscc);
 
   var note = [];
-  if(d.made){
-    note.push('Carton number = date made + a random code. Every carton is unique, on any computer.');
+  if(d.isC){
+    /* 형식을 설명하면 앞 6자리가 날짜라는 걸 알려주는 셈이다. 아무 말도 하지 않는다. */
   } else {
     if(sscc && !ssccValid(sscc)) note.push('\u26A0 SSCC check digit does not match — re-scan or check the label.');
     note.push('Carton identified by SSCC (GS1 Application Identifier 00).');
