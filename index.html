@@ -80,6 +80,28 @@
   .bad .t{ font-size:17px; font-weight:900; }
   .bad .d{ font-size:13px; color:var(--muted); margin-top:8px; line-height:1.55; }
   .hide{ display:none !important; }
+  /* ── 다음 박스 바로 찍기 ── */
+  .scanbtn{ display:block; width:100%; margin-top:14px; padding:16px 14px; border:none;
+    border-radius:16px; background:var(--navy); color:#fff; font:inherit;
+    font-size:16px; font-weight:900; letter-spacing:.06em; cursor:pointer;
+    box-shadow:0 6px 18px rgba(15,23,32,.18); -webkit-tap-highlight-color:transparent; }
+  .scanbtn:active{ transform:translateY(1px); }
+  .scanbtn.hide{ display:none !important; }
+  #scan{ position:fixed; inset:0; z-index:99; background:#000; display:none; }
+  #scan.on{ display:block; }
+  #scan video{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover; }
+  /* 조준틀 — 어디에 대야 하는지 모르면 사람이 폰을 이리저리 흔든다 */
+  #scan .aim{ position:absolute; left:50%; top:46%; transform:translate(-50%,-50%);
+    width:70vw; max-width:300px; aspect-ratio:1; border:3px solid rgba(255,255,255,.92);
+    border-radius:22px; box-shadow:0 0 0 100vmax rgba(0,0,0,.45); }
+  #scan .msg{ position:absolute; left:0; right:0; top:calc(46% + 38vw + 22px);
+    text-align:center; color:#fff; font-size:15px; font-weight:800; padding:0 22px;
+    text-shadow:0 1px 4px rgba(0,0,0,.6); line-height:1.5; }
+  #scan .x{ position:absolute; left:50%; transform:translateX(-50%);
+    bottom:calc(30px + env(safe-area-inset-bottom)); padding:15px 40px; border:none;
+    border-radius:999px; background:#fff; color:#101a2c; font:inherit;
+    font-size:16px; font-weight:900; letter-spacing:.05em; cursor:pointer; }
+
 </style>
 </head>
 <body>
@@ -137,6 +159,18 @@
   </div>
 
   <div class="note" id="note"></div>
+  <button class="scanbtn" id="scanbtn" type="button">&#128247;&nbsp; SCAN NEXT BOX</button>
+</div>
+
+<!-- ═══ 카메라 ═══
+     원래는 이 페이지를 닫고 → 카메라 앱 열고 → 다시 조준해야 다음 박스를 볼 수 있었다.
+     팔레트 하나에 박스가 수십 개라 그 왕복이 실제로 오래 걸린다.
+     여기서 바로 다음 QR 을 찍으면 페이지가 그 박스로 넘어간다. -->
+<div id="scan">
+  <video id="scan-v" playsinline muted></video>
+  <div class="aim"></div>
+  <div class="msg" id="scan-m">Point at the QR code on the next box</div>
+  <button class="x" id="scan-x" type="button">CANCEL</button>
 </div>
 
 <script>
@@ -300,6 +334,102 @@
     note.push('Carton identified by SSCC (GS1 Application Identifier 00).');
   }
   html('note', note.join('<br>'));
+})();
+</script>
+<script>
+/* ═══ 다음 박스 바로 찍기 ═══
+   따로 실행한다 — 위 스크립트는 화면 종류에 따라 중간에 return 으로 빠져나가서
+   거기에 붙이면 어떤 화면에서는 버튼이 죽는다. 특히 "박스 정보 없음" 화면에서
+   다시 찍기가 제일 필요하다.
+   jsQR 은 버튼을 누를 때 비로소 받아온다 — 안 누르는 사람이 대부분인데
+   130KB 를 매번 미리 받게 할 이유가 없다. */
+(function(){
+  var btn=document.getElementById('scanbtn'), box=document.getElementById('scan'),
+      vid=document.getElementById('scan-v'), msg=document.getElementById('scan-m'),
+      xbtn=document.getElementById('scan-x');
+  if(!btn||!box||!vid) return;
+
+  var stream=null, raf=0, cv=null, cx=null, busy=false;
+
+  function say(t){ if(msg) msg.textContent=t; }
+  function stop(){
+    if(raf) cancelAnimationFrame(raf); raf=0;
+    if(stream){ stream.getTracks().forEach(function(t){ try{ t.stop(); }catch(e){} }); stream=null; }
+    try{ vid.srcObject=null; }catch(e){}
+    box.classList.remove('on');
+    document.body.style.overflow='';
+  }
+  if(xbtn) xbtn.addEventListener('click', stop);
+
+  function load(cb){
+    if(window.jsQR) return cb(true);
+    var s=document.createElement('script');
+    s.src='/box/jsqr.min.js';
+    s.onload=function(){ cb(!!window.jsQR); };
+    s.onerror=function(){ cb(false); };
+    document.head.appendChild(s);
+  }
+
+  /* 읽은 값이 우리 박스 주소일 때만 이동한다.
+     남의 QR(포장지·운송장·광고)을 찍었을 때 엉뚱한 사이트로 넘어가면 안 된다. */
+  function handle(text){
+    var t=String(text||'').trim();
+    var u=null;
+    try{ u=new URL(t, location.href); }catch(e){}
+    if(u && u.host.toLowerCase()===location.host.toLowerCase() && /^\/box\//i.test(u.pathname)){
+      stop(); location.href=u.href; return true;
+    }
+    say('That is not a Pacific Sports box label. Try the QR on the carton.');
+    return false;
+  }
+
+  function tick(){
+    raf=requestAnimationFrame(tick);
+    if(busy || vid.readyState<2 || !vid.videoWidth) return;
+    busy=true;
+    try{
+      // 긴 변을 480px 로 줄여서 본다 — 원본 해상도로 매 프레임 돌리면 폰이 뜨겁고 느려진다
+      var w=vid.videoWidth, h=vid.videoHeight, k=Math.min(1, 480/Math.max(w,h));
+      var W=Math.round(w*k), H=Math.round(h*k);
+      if(cv.width!==W||cv.height!==H){ cv.width=W; cv.height=H; }
+      cx.drawImage(vid,0,0,W,H);
+      var img=cx.getImageData(0,0,W,H);
+      var r=window.jsQR(img.data, W, H, { inversionAttempts:'dontInvert' });
+      if(r && r.data){
+        if(navigator.vibrate) try{ navigator.vibrate(35); }catch(e){}
+        if(handle(r.data)) return;
+      }
+    }catch(e){}
+    busy=false;
+  }
+
+  btn.addEventListener('click', function(){
+    if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+      alert('This browser cannot open the camera here. Use the phone camera app to scan the next box.');
+      return;
+    }
+    box.classList.add('on');
+    document.body.style.overflow='hidden';
+    say('Starting camera\u2026');
+    load(function(ok){
+      if(!ok){ say('Could not load the scanner. Check the connection, or use the phone camera app.'); return; }
+      cv=document.createElement('canvas');
+      cx=cv.getContext('2d', { willReadFrequently:true });
+      navigator.mediaDevices.getUserMedia({ video:{ facingMode:{ ideal:'environment' } }, audio:false })
+        .then(function(s){
+          stream=s; vid.srcObject=s;
+          vid.setAttribute('playsinline','');   // iOS: 없으면 전체화면 재생기로 튄다
+          return vid.play();
+        })
+        .then(function(){ say('Point at the QR code on the next box'); busy=false; tick(); })
+        .catch(function(err){
+          var n=(err&&err.name)||'';
+          say(n==='NotAllowedError'
+            ? 'Camera permission was blocked. Allow the camera for this site in the browser settings \u2014 or use the phone camera app.'
+            : 'Cannot open the camera. Use the phone camera app to scan the next box.');
+        });
+    });
+  });
 })();
 </script>
 </body>
