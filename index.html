@@ -146,7 +146,10 @@
     <div class="tags" id="p-tags"></div>
     <div class="lines" id="p-lines"></div>
 
-    <div class="rows"><div class="r"><span class="k">TOTAL</span><span class="v" id="p-tot"></span></div></div>
+    <div class="rows">
+      <div class="r"><span class="k">TOTAL</span><span class="v" id="p-tot"></span></div>
+      <div class="r hide" id="p-rpk"><span class="k">PACKED</span><span class="v" id="p-packed"></span></div>
+    </div>
 
     <div class="foot"><div class="m">epacificsports.com</div></div>
   </div>
@@ -225,13 +228,22 @@
     var p = decodeURI(location.pathname || '');
     var m = p.match(/\/(?:pb|fb)\/([^\/]*)\/([^\/]*)\/([^\/]*)\/([^\/]*)\/(.*)$/i);
     if(!m) return null;
-    var items = String(m[5]||'').split('/').map(function(seg){
+    var rest = String(m[5]||'').split('/');
+    /* 박스번호 뒤에 숫자 6자만 있는 칸이 있으면 포장한 날짜다 (v853).
+       품목 칸은 STYLE*COLOR*SIZE*QTY 라 반드시 '*' 가 들어간다 — 그래서 안 헷갈린다.
+       이 칸이 없는 옛날 라벨은 그냥 날짜 없이 지금까지처럼 나온다. */
+    var packed = '';
+    if(rest.length && /^\d{6}$/.test(rest[0])){
+      var pm = rest.shift().match(/^(\d{2})(\d{2})(\d{2})$/);
+      packed = '20'+pm[1]+'-'+pm[2]+'-'+pm[3];
+    }
+    var items = rest.map(function(seg){
       var a = seg.split('*');
       if(!a[0]) return null;
       return { st:dec(a[0]), co:dec(a[1]||''), sz:dec(a[2]||''), qt:parseInt(a[3],10)||0 };
     }).filter(function(x){ return x; });
     if(!items.length) return null;
-    return { full:/\/fb\//i.test(p), cust:dec(m[1]), po:dec(m[2]), wh:dec(m[3]), box:dec(m[4]), items:items };
+    return { full:/\/fb\//i.test(p), cust:dec(m[1]), po:dec(m[2]), wh:dec(m[3]), box:dec(m[4]), items:items, packed:packed };
   }
 
   /* ── 공장 카톤 ──
@@ -297,6 +309,7 @@
       host.appendChild(row);
     });
     html('p-tot', pcsText(tot));
+    txt('p-packed', pb.packed); show('p-rpk', !!pb.packed);
     txt('note', pb.full
       ? 'Full carton — the piece count above is the whole box.'
       : 'Repacked box — the pieces listed above are what is inside this carton.');
