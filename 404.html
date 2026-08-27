@@ -103,6 +103,7 @@
       <div class="r" id="r-qty"><span class="k">QUANTITY</span><span class="v" id="v-qty"></span></div>
       <div class="r" id="r-lot"><span class="k">LOT</span><span class="v" id="v-lot"></span></div>
       <div class="r box" id="r-ctn"><span class="k">CARTON #</span><span class="v" id="v-ctn"></span></div>
+      <div class="r" id="r-made"><span class="k">MADE</span><span class="v" id="v-made"></span></div>
       <div class="r box" id="r-sscc"><span class="k">SSCC</span><span class="v" id="v-sscc"></span></div>
     </div>
 
@@ -211,6 +212,21 @@
     var seg = m[2] ? m[2].replace(/^\//,'').split('/') : [];
     return { sscc:m[1], s:dec(seg[0]), z:dec(seg[1]), q:dec(seg[2]), c:dec(seg[3]) };
   }
+  /* ── 새 카톤번호 (2026-08~) ──
+     /box/C/{YYMMDD-XXXXXXXXXX}/{STYLE}/{SIZE}/{QTY}/{COLOR}
+     SSCC 를 버리고 '날짜 + 랜덤 10자' 로 바꿨다. 컴퓨터끼리 번호를 맞출 필요가 없고
+     10만 장 한계도 없다. 앞 6자리가 만든 날짜라 스캔만 해도 생산일이 나온다.
+     글자는 A-Z + 2-7 (base32) — 0/O, 1/I 처럼 헷갈리는 짝이 없다. */
+  function readCtn(){
+    var p = decodeURI(location.pathname || '');
+    var m = p.match(/\/C\/(\d{6}-[A-Z2-7]{10})((?:\/[^\/]*)*)\/?$/i);
+    if(!m) return null;
+    var seg = m[2] ? m[2].replace(/^\//,'').split('/') : [];
+    var ctn = m[1].toUpperCase();
+    var dm  = ctn.match(/^(\d{2})(\d{2})(\d{2})-/);
+    return { ctn:ctn, made: dm ? ('20'+dm[1]+'-'+dm[2]+'-'+dm[3]) : '',
+             s:dec(seg[0]), z:dec(seg[1]), q:dec(seg[2]), c:dec(seg[3]) };
+  }
   function readHash(){
     var h = (location.hash||'').replace(/^#/,'');
     if(!h) return null;
@@ -252,7 +268,7 @@
     return;
   }
 
-  var d = readPath() || readHash();
+  var d = readCtn() || readPath() || readHash();
   if(!d){ show('card',false); show('empty',true); return; }
 
   var style = d.s || '';
@@ -273,11 +289,16 @@
   show('r-qty', !!qty);
   txt('v-lot',   lot);   show('r-lot',   !!lot);
   txt('v-ctn',   ctn);   show('r-ctn',   !!ctn);
+  txt('v-made',  d.made||''); show('r-made', !!d.made);
   txt('v-sscc',  sscc);  show('r-sscc',  !!sscc);
 
   var note = [];
-  if(sscc && !ssccValid(sscc)) note.push('⚠ SSCC check digit does not match — re-scan or check the label.');
-  note.push('Carton identified by SSCC (GS1 Application Identifier 00).');
+  if(d.made){
+    note.push('Carton number = date made + a random code. Every carton is unique, on any computer.');
+  } else {
+    if(sscc && !ssccValid(sscc)) note.push('\u26A0 SSCC check digit does not match — re-scan or check the label.');
+    note.push('Carton identified by SSCC (GS1 Application Identifier 00).');
+  }
   html('note', note.join('<br>'));
 })();
 </script>
