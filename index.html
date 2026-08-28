@@ -105,6 +105,7 @@
 </style>
 </head>
 <body>
+<script src="boxkey.js"></script>
 <div class="wrap">
 
   <!-- 공장에서 온 온전한 카톤 (한 박스 = 한 품목) -->
@@ -120,6 +121,9 @@
     </div>
 
     <div class="rows">
+      <!-- 나간 박스에만 나온다 — 서버에 박스번호를 물어봐서 채운다 (2026-08-28) -->
+      <div class="r hide" id="r-cust"><span class="k">SHIPPED&nbsp;TO</span><span class="v" id="v-cust"></span></div>
+      <div class="r hide" id="r-po"><span class="k">PO&nbsp;#</span><span class="v" id="v-po"></span></div>
       <div class="r" id="r-color"><span class="k">COLOR</span><span class="v" id="v-color"></span></div>
       <div class="r" id="r-size"><span class="k">SIZE</span><span class="v" id="v-size"></span></div>
       <div class="r" id="r-qty"><span class="k">QUANTITY</span><span class="v" id="v-qty"></span></div>
@@ -338,6 +342,29 @@
   txt('v-lot',   lot);   show('r-lot',   !!lot);
   txt('v-ctn',   ctn);   show('r-ctn',   !!ctn);
   txt('v-sscc',  sscc);  show('r-sscc',  !!sscc);
+
+  /* ── 이 박스가 나갔는지 물어본다 (2026-08-28) ──
+     박스 QR 에는 "누구 물건인지" 가 없다. 박스를 만들 때는 주인이 정해져 있지 않기 때문이다.
+     그래서 박스번호 하나로 서버에 물어본다. 돌아오는 건 거래처·PO·출고일 세 개뿐이고,
+     아직 안 나간 박스는 아무것도 안 돌아온다. 목록 조회는 불가능하다.
+     실패하거나 인터넷이 없으면 지금까지처럼 박스 내용만 나온다 — 화면이 깨지지 않는다. */
+  (function(){
+    if(!ctn) return;
+    var SB='https://ypjnhhtfwyrwcjakjcgc.supabase.co', K=(window.PS_BOX_KEY||'');
+    if(!K) return;                                   // boxkey.js 에 키가 없으면 조용히 넘어간다
+    try{
+      fetch(SB+'/rest/v1/rpc/box_info', {
+        method:'POST',
+        headers:{ 'apikey':K, 'Authorization':'Bearer '+K, 'Content-Type':'application/json' },
+        body: JSON.stringify({ p_ctn: ctn })
+      }).then(function(r){ return r.ok ? r.json() : null; }).then(function(j){
+        var row = j && j.length ? j[0] : null;
+        if(!row) return;
+        if(row.cust){ txt('v-cust', row.cust); show('r-cust', true); }
+        if(row.po){   txt('v-po',   row.po);   show('r-po',   true); }
+      }).catch(function(){});
+    }catch(e){}
+  })();
 
   var note = [];
   if(d.isC){
