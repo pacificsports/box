@@ -15,12 +15,12 @@
     --ink:#0f1720; --muted:#6b7a90; --line:#e6eaf0; --fill:#f1f4f8;
     --bg:#eef1f6; --card:#ffffff;
     /* 출고 정보 글자색 — 빨강. 카드에 빨간 글씨가 여기밖에 없어서 제일 먼저 눈에 들어온다 */
-    --acc:#d0161e; --accSub:#b05a5e;
+    --acc:#d0161e;
   }
   @media (prefers-color-scheme: dark){
     :root{ --ink:#e8eef5; --muted:#95a4b8; --line:#1e2a3d; --fill:#16202f;
            --bg:#080d16; --card:#0e1622;
-           --acc:#ff6a68; --accSub:#b86f72; }
+           --acc:#ff6a68; }
   }
   *{ box-sizing:border-box; -webkit-text-size-adjust:100%; }
   body{ margin:0; background:var(--bg); color:var(--ink);
@@ -60,7 +60,7 @@
   .r .v em{ font-style:normal; font-size:13px; font-weight:800; color:var(--muted); margin-left:6px; }
   /* 출고 정보 (거래처 · PO · 날짜) — COLOR/SIZE 줄과 똑같은 모양으로 두고
      글자 색만 다르게 한다. 판을 따로 두니까 오히려 지저분했다 (2026-08-28). */
-  .r.acc .k{ color:var(--accSub); }
+  /* 왼쪽 이름표는 COLOR/SIZE 와 똑같은 회색으로 둔다 — 빨강이 값에만 있어야 더 튄다 */
   .r.acc .v{ color:var(--acc); }
   .r.acc .v.nm{ font-size:19px; letter-spacing:-.2px; line-height:1.2; }
   .r.acc .v.mono{ font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
