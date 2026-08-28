@@ -14,10 +14,13 @@
     --cream:#e9e0c6; --creamInk:#3a3222;
     --ink:#0f1720; --muted:#6b7a90; --line:#e6eaf0; --fill:#f1f4f8;
     --bg:#eef1f6; --card:#ffffff;
+    /* 출고 정보 판 */
+    --shipBg:#eef3fa; --shipEdge:#c9d8ee; --shipInk:#0f2a4a; --shipSub:#5d7793;
   }
   @media (prefers-color-scheme: dark){
     :root{ --ink:#e8eef5; --muted:#95a4b8; --line:#1e2a3d; --fill:#16202f;
-           --bg:#080d16; --card:#0e1622; }
+           --bg:#080d16; --card:#0e1622;
+           --shipBg:#122032; --shipEdge:#24405f; --shipInk:#d3e3f7; --shipSub:#8fa9c4; }
   }
   *{ box-sizing:border-box; -webkit-text-size-adjust:100%; }
   body{ margin:0; background:var(--bg); color:var(--ink);
@@ -48,6 +51,23 @@
   .tag{ background:var(--fill); color:var(--muted); border-radius:999px;
         padding:6px 12px; font-size:11px; font-weight:900; letter-spacing:.07em; }
   .tag.on{ color:var(--ink); }
+
+  /* ── 출고 정보 (거래처 · PO · 날짜) ──
+     박스 규격 줄들과 같은 모양으로 두면 눈에 안 들어온다. 색을 준 판 하나로 묶어
+     흰 몸통 맨 위에 올린다. 손님이 제일 먼저 확인하는 게 이거다. */
+  .ship{ margin:14px 18px 2px; background:var(--shipBg); border:1px solid var(--shipEdge);
+         border-radius:14px; padding:13px 15px 14px; }
+  .ship .slab{ font-size:10.5px; font-weight:900; letter-spacing:.16em; color:var(--shipSub); }
+  .ship .scust{ font-size:21px; font-weight:900; color:var(--shipInk); line-height:1.2;
+                margin-top:5px; word-break:break-word; }
+  .ship .srow{ display:flex; align-items:baseline; gap:12px; margin-top:11px; }
+  .ship .spo{ display:flex; align-items:baseline; gap:7px; min-width:0; }
+  .ship .spo span{ flex:none; font-size:10.5px; font-weight:900; letter-spacing:.14em; color:var(--shipSub); }
+  .ship .spo b{ font-size:24px; font-weight:900; color:var(--shipInk); letter-spacing:-.2px;
+                font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+                word-break:break-all; }
+  .ship .sdate{ margin-left:auto; flex:none; font-size:12.5px; font-weight:800;
+                color:var(--shipSub); white-space:nowrap; }
 
   .rows{ padding:6px 18px 4px; }
   .r{ display:flex; align-items:center; gap:12px; padding:14px 0; border-bottom:1px solid var(--line); }
@@ -105,7 +125,9 @@
 </style>
 </head>
 <body>
-<script src="boxkey.js"></script>
+<!-- 반드시 절대경로여야 한다. QR 이 여는 주소는 /box/C/{박스번호}/{스타일}/... 처럼 깊어서,
+     상대경로로 두면 /box/C/260827-XXXX/1350/L/72/boxkey.js 를 찾다가 못 찾는다. -->
+<script src="/box/boxkey.js"></script>
 <div class="wrap">
 
   <!-- 공장에서 온 온전한 카톤 (한 박스 = 한 품목) -->
@@ -120,11 +142,18 @@
       <div class="hsub hide" id="v-item"></div>
     </div>
 
+    <!-- 나간 박스에만 나온다 — 박스번호로 서버에 물어봐서 채운다 (2026-08-28).
+         박스 규격과 섞이면 눈에 안 들어와서 따로 묶어 맨 위에 둔다. -->
+    <div class="ship hide" id="shipbox">
+      <div class="slab">SHIPPED TO</div>
+      <div class="scust" id="v-cust"></div>
+      <div class="srow">
+        <div class="spo hide" id="s-po"><span>PO</span><b id="v-po"></b></div>
+        <div class="sdate hide" id="v-shipd"></div>
+      </div>
+    </div>
+
     <div class="rows">
-      <!-- 나간 박스에만 나온다 — 서버에 박스번호를 물어봐서 채운다 (2026-08-28) -->
-      <div class="r hide" id="r-cust"><span class="k">SHIPPED&nbsp;TO</span><span class="v" id="v-cust"></span></div>
-      <div class="r hide" id="r-po"><span class="k">PO&nbsp;#</span><span class="v" id="v-po"></span></div>
-      <div class="r hide" id="r-shipd"><span class="k">SHIPPED</span><span class="v" id="v-shipd"></span></div>
       <div class="r" id="r-color"><span class="k">COLOR</span><span class="v" id="v-color"></span></div>
       <div class="r" id="r-size"><span class="k">SIZE</span><span class="v" id="v-size"></span></div>
       <div class="r" id="r-qty"><span class="k">QUANTITY</span><span class="v" id="v-qty"></span></div>
@@ -361,8 +390,10 @@
       }).then(function(r){ return r.ok ? r.json() : null; }).then(function(j){
         var row = j && j.length ? j[0] : null;
         if(!row) return;
-        if(row.cust){ txt('v-cust', row.cust); show('r-cust', true); }
-        if(row.po){   txt('v-po',   row.po);   show('r-po',   true); }
+        if(!row.cust && !row.po) return;
+        show('shipbox', true);
+        txt('v-cust', row.cust || '');
+        if(row.po){ txt('v-po', row.po); show('s-po', true); }
         /* 출고일 — 손님이 "언제 보냈냐" 를 제일 많이 묻는다. 서버가 뉴욕 시간 기준
            날짜만 준다 (시각은 안 준다 — 알 필요도 없고 오해만 만든다). */
         if(row.shipped_on){
@@ -371,7 +402,7 @@
           var nice = (d.length===3 && MON[parseInt(d[1],10)-1])
             ? (MON[parseInt(d[1],10)-1] + ' ' + parseInt(d[2],10) + ', ' + d[0])
             : String(row.shipped_on);
-          txt('v-shipd', nice); show('r-shipd', true);
+          txt('v-shipd', 'SHIPPED ' + nice); show('v-shipd', true);
         }
       }).catch(function(){});
     }catch(e){}
