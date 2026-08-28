@@ -124,6 +124,7 @@
       <!-- 나간 박스에만 나온다 — 서버에 박스번호를 물어봐서 채운다 (2026-08-28) -->
       <div class="r hide" id="r-cust"><span class="k">SHIPPED&nbsp;TO</span><span class="v" id="v-cust"></span></div>
       <div class="r hide" id="r-po"><span class="k">PO&nbsp;#</span><span class="v" id="v-po"></span></div>
+      <div class="r hide" id="r-shipd"><span class="k">SHIPPED</span><span class="v" id="v-shipd"></span></div>
       <div class="r" id="r-color"><span class="k">COLOR</span><span class="v" id="v-color"></span></div>
       <div class="r" id="r-size"><span class="k">SIZE</span><span class="v" id="v-size"></span></div>
       <div class="r" id="r-qty"><span class="k">QUANTITY</span><span class="v" id="v-qty"></span></div>
@@ -362,6 +363,16 @@
         if(!row) return;
         if(row.cust){ txt('v-cust', row.cust); show('r-cust', true); }
         if(row.po){   txt('v-po',   row.po);   show('r-po',   true); }
+        /* 출고일 — 손님이 "언제 보냈냐" 를 제일 많이 묻는다. 서버가 뉴욕 시간 기준
+           날짜만 준다 (시각은 안 준다 — 알 필요도 없고 오해만 만든다). */
+        if(row.shipped_on){
+          var d = String(row.shipped_on).split('-');
+          var MON = ['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+          var nice = (d.length===3 && MON[parseInt(d[1],10)-1])
+            ? (MON[parseInt(d[1],10)-1] + ' ' + parseInt(d[2],10) + ', ' + d[0])
+            : String(row.shipped_on);
+          txt('v-shipd', nice); show('r-shipd', true);
+        }
       }).catch(function(){});
     }catch(e){}
   })();
